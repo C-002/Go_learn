@@ -53,3 +53,35 @@ func filenamesFromCommandLine() (inFilename, outFilename string, err error) {
 	return inFilename, outFilename, nil
 }
 
+var britishAmerican = "british-american.txt"
+
+func americanise(inFile io.Reader, outFile io.Writer) (err error) {
+	reader := bufio.NewReader(inFile)
+	writer := bufio.NewWriter(outFile)
+	defer func() {
+		if err == nil {
+			err = writer.Flush()
+		}
+	} ()
+	var replacer func(string) string
+	if replacer, err = makeReplacerFunction(britishAmerican); err != nil {
+		return err
+	}
+	wordRx := regexp.MustCompile("[A-Za-z]+")
+	eof := false
+	for !eof {
+		var line string
+		line, err = reader.ReadString('\n')
+		if err == io.EOF {
+			err = nil
+			eof = true
+		} else if err != nil {
+			return err
+		}
+		line = wordRx.ReplaceAllStringFunc(line, replacer)
+		if _, err = writer.WriteString(line); err != nil {
+			return err
+		}
+	}
+	return nil
+}
