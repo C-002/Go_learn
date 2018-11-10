@@ -85,3 +85,27 @@ func americanise(inFile io.Reader, outFile io.Writer) (err error) {
 	}
 	return nil
 }
+
+func makeReplacerFunction(file string) (func(string) string, error) {
+	rawBytes, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+	text := string(rawBytes)
+
+	usForBritish := make(map[string]string)
+	lines := strings.Split(text, "\n")
+	for _, line := range lines {
+		fields := strings.Fields(line)
+		if len(fields) == 2 {
+			usForBritish[fields[0]] = fields[1]
+		}
+	}
+
+	return func(word string) string {
+		if usWord, found := usForBritish[word]; found {
+			return usWord
+		}
+		return word
+	}, nil
+}
