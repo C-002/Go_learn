@@ -103,7 +103,7 @@ func main() {
 		for column := range stringOfDigits {
 			digit := stringOfDigits[column] - '0'
 			if 0 <= digit && digit <= 9 {
-				line += bigDigits[digit][row] + "  "
+				line += bigDigits[digit][row] + " "
 			} else {
 				log.Fatal("invalid whole number")
 			}
